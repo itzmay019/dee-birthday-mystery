@@ -160,7 +160,7 @@ const clues = {
   note: {
     title: "THE NOTE",
     emoji: "📝",
-    description: 'A note reads: "I DID NOT TAKE THE CANDLE. I WAS NOWHERE NEAR THE CAKE." It is signed THE BIRTHDAY GREMLIN. A little defensive, aren't we?'
+   description: "A note reads: I DID NOT TAKE THE CANDLE. I WAS NOWHERE NEAR THE CAKE. It is signed THE BIRTHDAY GREMLIN. A little defensive, aren't we?"
   },
   footprints: {
     title: "THE FOOTPRINTS",

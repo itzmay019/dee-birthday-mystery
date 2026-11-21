@@ -33,8 +33,9 @@ const rooms = [
 ];
 
 function startGame() {
-  showDashboard();
-}
+    alert("JAVASCRIPT IS CONNECTED!");
+    showDashboard();
+  }
 
 function showDashboard() {
   app.innerHTML = `

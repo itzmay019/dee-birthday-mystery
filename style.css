@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&display=swap');
 
 :root {
-  --yellow: #ffd45e;
-  --coral: #f47765;
-  --mint: #8ed6bd;
-  --purple: #b9a3e8;
-  --pink: #f3a7c4;
-  --navy: #344b70;
-  --paper: #fff9eb;
-  --ink: #34445c;
+  --yellow: #ffdc7d;
+  --pink: #ce9990;
+  --sage: #8A9A5B;
+  --lilac: #C8A2C8;
+  --rose: #F33A6A;
+  --cream: #F7E7CE;
+  --paper: #F7E7CE;
+  --ink: #000000;
 }
 
 * {
@@ -669,6 +669,152 @@ footer {
   
     .room-status {
       font-size: 0.65rem;
+    }
+  }
+  
+/* DEE'S INVESTIGATION — NEW ROOM STYLES */
+
+.mixtape {
+    background: #f3a7c4;
+    color: #34445c;
+    border: 3px solid #344b70;
+    border-radius: 18px;
+    padding: 22px;
+    margin: 24px auto;
+    max-width: 420px;
+    text-align: center;
+    transform: rotate(-1deg);
+    box-shadow: 5px 6px 0 #344b70;
+  }
+  
+  .cassette-holes {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .cassette-holes span {
+    width: 38px;
+    height: 38px;
+    border: 5px solid #34445c;
+    border-radius: 50%;
+    background: #fff9eb;
+  }
+  
+  .mixtape h2 {
+    font-size: 2rem;
+    letter-spacing: 3px;
+    margin: 12px 0;
+  }
+  
+  .mixtape p {
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+  
+  .cassette-reels {
+    background: #fff9eb;
+    border: 2px solid #344b70;
+    border-radius: 9px;
+    padding: 12px;
+    margin-top: 18px;
+    font-size: 1.4rem;
+  }
+  
+  .cipher-code {
+    font-size: 2.5rem;
+    letter-spacing: 9px;
+    margin: 16px 0;
+  }
+  
+  .charcuterie {
+    background: #f5dfb5;
+    border: 8px solid #a97948;
+    border-radius: 45%;
+    padding: 30px 15px;
+    margin: 25px auto;
+    max-width: 430px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 13px;
+    box-shadow: 4px 5px 0 #344b70;
+  }
+  
+  .charcuterie div {
+    background: #fff9eb;
+    border-radius: 50%;
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+  }
+  
+  .charcuterie p {
+    flex-basis: 100%;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #60472f;
+  }
+  
+  .investigator-note {
+    background: #fff4df;
+    border-left: 5px solid #e7a83e;
+    padding: 15px;
+    margin: 22px 0;
+    line-height: 1.55;
+    transform: rotate(-0.3deg);
+    border-radius: 4px 12px 12px 4px;
+  }
+  
+  .investigator-note strong {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  
+  .final-evidence p {
+    margin: 9px 0;
+    line-height: 1.4;
+  }
+  
+  .birthday-message {
+    text-align: left;
+    line-height: 1.7;
+  }
+  
+  .birthday-message h2 {
+    text-align: center;
+    margin-top: 0;
+  }
+  
+  .birthday-message p {
+    margin: 14px 0;
+  }
+  
+  @media (max-width: 480px) {
+    .mixtape {
+      padding: 16px;
+    }
+  
+    .charcuterie {
+      gap: 8px;
+      padding: 22px 10px;
+    }
+  
+    .charcuterie div {
+      width: 48px;
+      height: 48px;
+      font-size: 1.6rem;
+    }
+  
+    .cipher-code {
+      font-size: 2rem;
+      letter-spacing: 6px;
     }
   }
   

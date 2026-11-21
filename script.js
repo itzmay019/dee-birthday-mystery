@@ -1,22 +1,22 @@
 
 const app = document.getElementById("app");
+const SAVE_KEY = "deeBirthdayInvestigation_v2";
 
-const SAVE_KEY = "deeBirthdayInvestigation_v1";
-
-const defaultProgress = {
+const freshProgress = () => ({
   completed: [],
   unlocked: 1,
   evidence: [],
-};
+  inspected: [],
+});
 
 let progress = loadProgress();
 
 function loadProgress() {
   try {
-    const saved = localStorage.getItem(SAVE_KEY);
-    return saved ? { ...defaultProgress, ...JSON.parse(saved) } : { ...defaultProgress };
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    return saved ? { ...freshProgress(), ...saved } : freshProgress();
   } catch {
-    return { ...defaultProgress };
+    return freshProgress();
   }
 }
 
@@ -25,11 +25,11 @@ function saveProgress() {
 }
 
 const rooms = [
-  { name: "The Crime Scene", icon: "🔎", subtitle: "A suspicious birthday incident." },
-  { name: "The Secret Message", icon: "🔐", subtitle: "Something is hidden in plain sight." },
-  { name: "The Suspect Files", icon: "🕵️", subtitle: "Someone isn't telling the truth." },
-  { name: "The Birthday Disaster", icon: "🎈", subtitle: "A party-planning catastrophe." },
-  { name: "The Final File", icon: "🏆", subtitle: "One last challenge." },
+  ["🔎", "THE CRIME SCENE", "A birthday mystery. A suspicious cake."],
+  ["📼", "THE SOUNDTRACK", "A little 90s music knowledge, please."],
+  ["🕵️", "THE SUSPECT FILES", "Someone's story isn't adding up."],
+  ["🧀", "THE BIRTHDAY BUSINESS", "A very important party-planning emergency."],
+  ["🏆", "THE FINAL FILE", "One last password stands between you and glory."],
 ];
 
 function startGame() {
@@ -39,11 +39,11 @@ function startGame() {
 function showDashboard() {
   app.innerHTML = `
     <section class="game-card dashboard">
-      <p class="eyebrow">BIRTHDAY INVESTIGATION BUREAU</p>
-      <h1>THE CASE FILES</h1>
+      <p class="eyebrow">BIRTHDAY INVESTIGATION BUREAU · EST. 1977</p>
+      <h1>THE DEE<br>INVESTIGATION FILES</h1>
       <p class="scene-intro">
         Welcome back, Detective. Five rooms. Five challenges.
-        One very important birthday.
+        One woman who has somehow made collecting reward points a personality trait.
       </p>
 
       <div class="dashboard-stats">
@@ -56,14 +56,13 @@ function showDashboard() {
           const number = i + 1;
           const done = progress.completed.includes(number);
           const unlocked = number <= progress.unlocked;
-
           return `
             <button class="room-card ${done ? "room-done" : ""}"
               ${unlocked ? `onclick="openRoom(${number})"` : "disabled"}>
-              <span class="room-icon">${room.icon}</span>
+              <span class="room-icon">${room[0]}</span>
               <span class="room-info">
-                <strong>ROOM ${String(number).padStart(2, "0")} · ${room.name}</strong>
-                <small>${room.subtitle}</small>
+                <strong>ROOM 0${number} · ${room[1]}</strong>
+                <small>${room[2]}</small>
               </span>
               <span class="room-status">${done ? "✓ SOLVED" : unlocked ? "OPEN →" : "🔒"}</span>
             </button>
@@ -71,15 +70,26 @@ function showDashboard() {
         }).join("")}
       </div>
 
-      <p class="tiny">Progress saves automatically on this device.</p>
-      <button class="reset-button" onclick="confirmReset()">RESET CASE FILES</button>
+      <div class="investigator-note">
+        <strong>INVESTIGATOR'S NOTE:</strong>
+        Progress saves automatically on this device. You may leave and return.
+        Unlike certain people, this website has its life together.
+      </div>
+
+      <button class="reset-button" onclick="confirmReset()">RESET ALL PROGRESS</button>
     </section>
+  `;
+}
+
+function roomHeader(number) {
+  return `
+    <button class="back-button" onclick="showDashboard()">← BACK TO CASE FILES</button>
+    <p class="eyebrow">CASE 049 · ROOM 0${number} OF 05</p>
   `;
 }
 
 function openRoom(number) {
   if (number > progress.unlocked) return;
-
   if (number === 1) roomOne();
   if (number === 2) roomTwo();
   if (number === 3) roomThree();
@@ -87,38 +97,36 @@ function openRoom(number) {
   if (number === 5) roomFive();
 }
 
-function roomHeader(number) {
-  return `
-    <button class="back-button" onclick="showDashboard()">← CASE FILES</button>
-    <p class="eyebrow">ROOM ${String(number).padStart(2, "0")} OF 05</p>
-  `;
+function addEvidence(item) {
+  if (!progress.evidence.includes(item)) {
+    progress.evidence.push(item);
+  }
+  saveProgress();
 }
 
 function completeRoom(number, evidence) {
   if (!progress.completed.includes(number)) {
     progress.completed.push(number);
     progress.unlocked = Math.max(progress.unlocked, number + 1);
-    if (evidence && !progress.evidence.includes(evidence)) {
-      progress.evidence.push(evidence);
-    }
-    saveProgress();
   }
+  if (evidence) addEvidence(evidence);
+  saveProgress();
   showRoomComplete(number, evidence);
 }
 
 function showRoomComplete(number, evidence) {
   app.innerHTML = `
     <section class="game-card">
-      <p class="eyebrow">INVESTIGATION UPDATE</p>
-      <h1>ROOM SOLVED!</h1>
+      <p class="eyebrow">INVESTIGATION UPDATE · ROOM 0${number}</p>
+      <h1>CASE SOLVED!</h1>
       <div class="big-doodle">🎉 🔎 ✨</div>
-      <p class="scene-intro">Excellent work, Detective. Another piece of the mystery has been uncovered.</p>
+      <p class="scene-intro">Excellent work, Detective. Another mystery has been dealt with.</p>
       <div class="evidence-award">
         <span>📁 EVIDENCE COLLECTED</span>
-        <strong>${evidence || "CASE COMPLETE"}</strong>
+        <strong>${evidence}</strong>
       </div>
       <button onclick="showDashboard()">BACK TO CASE FILES →</button>
-      <p class="tiny">Your next room is now unlocked.</p>
+      <p class="tiny">Your next room is unlocked. Try not to let it go to your head.</p>
     </section>
   `;
 }
@@ -128,62 +136,79 @@ function wrongAnswer(message) {
   if (feedback) feedback.textContent = message;
 }
 
-// ROOM 1 — CRIME SCENE
+function showHint(message) {
+  const hint = document.getElementById("hint-display");
+  if (hint) hint.textContent = message;
+}
+
+// --------------------------------------------------
+// ROOM 1 — THE CRIME SCENE
+// --------------------------------------------------
 
 const clues = {
   cake: {
     title: "THE CAKE STAND",
     emoji: "🎂",
-    description: "The final candle is missing. A smear of icing sits on the edge of the stand. Whoever took it was not particularly careful."
+    description: "The birthday cake has lost its final candle. There is icing on the stand and a suspicious little fingerprint. Someone has been snacking on the evidence."
   },
   hat: {
     title: "THE PARTY HAT",
     emoji: "🥳",
-    description: "A yellow party hat has been abandoned beside the table. There is icing inside it. Very suspicious headwear."
+    description: "A party hat has been abandoned beside the table. There's icing inside it. Either someone has a very unusual hat routine, or they were extremely close to the cake."
   },
   note: {
     title: "THE NOTE",
     emoji: "📝",
-    description: 'A note reads: "I did NOT take the candle. I was nowhere near the cake." It is signed THE BIRTHDAY GREMLIN. Defensive much?'
+    description: 'A note reads: "I DID NOT TAKE THE CANDLE. I WAS NOWHERE NEAR THE CAKE." It is signed THE BIRTHDAY GREMLIN. A little defensive, aren't we?'
   },
   footprints: {
     title: "THE FOOTPRINTS",
-    emoji: "🐾",
-    description: "Tiny pawprints lead towards the cake table, but none lead away. The cat visited the scene, but that does not prove it stole anything."
+    emoji: "👣",
+    description: "A trail of tiny footprints leads towards the cake, but not away from it. A distraction, perhaps? The Bureau has ruled out animals. We respect the allergies."
   }
 };
-
-let inspected = new Set();
 
 function roomOne() {
   app.innerHTML = `
     <section class="game-card crime-scene">
       ${roomHeader(1)}
       <h1>THE CRIME SCENE</h1>
-      <p class="scene-intro">The birthday cake has been tampered with. One candle is missing. Four clues remain. Investigate everything.</p>
-      <div class="scene-warning">🚨 OFFICIAL NOTICE: Cake-related crimes will be taken seriously.</div>
+      <p class="scene-intro">
+        Emergency! The birthday cake has been tampered with.
+        One candle is missing. Four clues remain.
+        We need a competent detective. Apparently, that's you.
+      </p>
+
+      <div class="scene-warning">
+        🚨 OFFICIAL NOTICE: Cake-related crimes will be taken seriously.
+      </div>
+
       <h2>Inspect the evidence</h2>
       <p class="instruction">Tap each object to investigate it.</p>
 
       <div class="evidence-grid">
         ${Object.entries(clues).map(([key, clue]) => `
-          <button class="evidence-object ${inspected.has(key) ? "inspected" : ""}" onclick="inspectClue('${key}')">
+          <button class="evidence-object ${progress.inspected.includes(key) ? "inspected" : ""}"
+            onclick="inspectClue('${key}')">
             <span class="evidence-emoji">${clue.emoji}</span>
             <span class="evidence-name">${clue.title}</span>
-            <span class="evidence-status">${inspected.has(key) ? "✓ INVESTIGATED" : "TAP TO INSPECT"}</span>
+            <span class="evidence-status">
+              ${progress.inspected.includes(key) ? "✓ INVESTIGATED" : "TAP TO INSPECT"}
+            </span>
           </button>
         `).join("")}
       </div>
 
       <div id="clue-display" class="clue-display">
-        <span class="clue-placeholder">🔎 Evidence will appear here.</span>
+        <span class="clue-placeholder">🔎 Your evidence will appear here.</span>
       </div>
 
-      <p class="clue-progress">${inspected.size} / 4 clues investigated</p>
+      <p class="clue-progress">${progress.inspected.length} / 4 clues investigated</p>
 
-      ${inspected.size === 4 ? `
+      ${progress.inspected.length === 4 ? `
         <div class="deduction-box">
           <h2>Who stole the candle?</h2>
+          <p>Choose the culprit. Think before you accuse. This is not a family group chat.</p>
           <div class="suspect-options">
             <button class="suspect-button" onclick="checkRoomOne('cat')">🐈 The Cat</button>
             <button class="suspect-button" onclick="checkRoomOne('inspector')">🕵️ The Cake Inspector</button>
@@ -193,14 +218,17 @@ function roomOne() {
         </div>
       ` : `<p class="locked-message">🔒 Investigate all four clues to unlock the accusation.</p>`}
 
-      <button class="hint-button" onclick="showRoomHint(1)">I NEED A HINT</button>
+      <button class="hint-button" onclick="showHint('The footprints are a distraction. Focus on the evidence connecting someone to the cake.')">I NEED A HINT</button>
       <p id="hint-display" class="hint-display"></p>
     </section>
   `;
 }
 
 function inspectClue(key) {
-  inspected.add(key);
+  if (!progress.inspected.includes(key)) {
+    progress.inspected.push(key);
+    saveProgress();
+  }
   roomOne();
 
   const clue = clues[key];
@@ -217,32 +245,45 @@ function checkRoomOne(answer) {
     completeRoom(1, "THE GREMLIN'S CONFESSION");
   } else {
     wrongAnswer(answer === "cat"
-      ? "The cat is suspicious, but the pawprints don't prove anything. Keep investigating."
-      : "The Cake Inspector has an alibi. A very sticky alibi, but an alibi nonetheless.");
+      ? "The cat is suspicious, but the footprints don't prove anything. Also, the cat has declined to comment."
+      : "The Cake Inspector has an alibi. A sticky one, but an alibi nonetheless.");
   }
 }
 
-// ROOM 2 — SECRET MESSAGE
+// --------------------------------------------------
+// ROOM 2 — THE SOUNDTRACK
+// --------------------------------------------------
 
 function roomTwo() {
   app.innerHTML = `
     <section class="game-card">
       ${roomHeader(2)}
-      <h1>THE SECRET MESSAGE</h1>
-      <p class="scene-intro">The Birthday Gremlin left a coded message behind. Apparently, stealing candles wasn't enough. Now they're being dramatic.</p>
+      <h1>THE SOUNDTRACK</h1>
+      <p class="scene-intro">
+        A mysterious mixtape has been found. The label says it contains
+        a message for Dee. Naturally, the Bureau has confiscated it.
+      </p>
 
-      <div class="cipher-paper">
-        <p class="eyebrow">RECOVERED MESSAGE</p>
-        <h2 class="cipher-code">DBOEMF</h2>
-        <p>Every letter has been moved <strong>one step forward</strong> in the alphabet.</p>
-        <p>For example: A becomes B. B becomes C.</p>
+      <div class="mixtape">
+        <div class="cassette-holes"><span></span><span></span></div>
+        <p class="eyebrow">SIDE A · THE 90s EDITION</p>
+        <h2>THE DEE MIX</h2>
+        <p>POP · R&B · QUESTIONABLE DANCING</p>
+        <div class="cassette-reels">◉ ━━━━━━━━━ ◉</div>
       </div>
 
-      <label class="puzzle-label" for="cipher-answer">What was the original word?</label>
-      <input id="cipher-answer" class="puzzle-input" placeholder="Enter your answer..." autocomplete="off">
-      <button onclick="checkRoomTwo()">DECODE MESSAGE →</button>
+      <div class="clue-display">
+        <h3>📼 THE SECRET TRACK</h3>
+        <p>The message has been encoded by moving every letter one step FORWARD in the alphabet.</p>
+        <h2 class="cipher-code">WJCF</h2>
+        <p>Example: A becomes B. B becomes C. To decode, move backwards.</p>
+      </div>
+
+      <label class="puzzle-label" for="cipher-answer">What is the secret word?</label>
+      <input id="cipher-answer" class="puzzle-input" placeholder="Enter the word..." autocomplete="off">
+      <button onclick="checkRoomTwo()">PLAY THE SECRET TRACK →</button>
       <p id="feedback" class="answer-feedback"></p>
-      <button class="hint-button" onclick="showRoomHint(2)">I NEED A HINT</button>
+      <button class="hint-button" onclick="showHint('Move every letter one place BACKWARDS. W becomes V, for example.')">I NEED A HINT</button>
       <p id="hint-display" class="hint-display"></p>
     </section>
   `;
@@ -250,39 +291,44 @@ function roomTwo() {
 
 function checkRoomTwo() {
   const answer = document.getElementById("cipher-answer").value.trim().toUpperCase();
-  if (answer === "CANDLE") {
-    completeRoom(2, "THE WORD CANDLE");
+  if (answer === "VIBE") {
+    completeRoom(2, "THE SECRET WORD: VIBE");
   } else {
-    wrongAnswer("Not quite. Remember: the displayed letters moved FORWARD. To decode, move them backwards.");
+    wrongAnswer("Not quite. The letters moved forward when the message was written. Reverse the shift!");
   }
 }
 
-// ROOM 3 — SUSPECT FILES
+// --------------------------------------------------
+// ROOM 3 — THE SUSPECT FILES
+// --------------------------------------------------
 
 function roomThree() {
   app.innerHTML = `
     <section class="game-card">
       ${roomHeader(3)}
       <h1>THE SUSPECT FILES</h1>
-      <p class="scene-intro">Three people were near the cake. One of them is lying. Read the statements carefully.</p>
+      <p class="scene-intro">
+        Three suspects were near the birthday preparations.
+        One is lying. The evidence is in. Time to channel your favourite cop show.
+      </p>
 
       <div class="suspect-file">
-        <h3>🧢 AVA</h3>
+        <h3>🧢 AVA · THE ARRIVAL EXPERT</h3>
         <p>"I arrived after the candle had already disappeared."</p>
       </div>
       <div class="suspect-file">
-        <h3>🎩 MAX</h3>
+        <h3>🎩 MAX · THE BEST FRIEND</h3>
         <p>"I was with Dee the entire time. I never went near the cake."</p>
       </div>
       <div class="suspect-file">
-        <h3>👹 MILO</h3>
+        <h3>👹 MILO · THE PARTY GUEST</h3>
         <p>"I didn't touch the cake. I was nowhere near it."</p>
       </div>
 
       <div class="clue-display">
         <h3>📂 ADDITIONAL EVIDENCE</h3>
-        <p>• Ava's arrival time is confirmed by two witnesses.</p>
-        <p>• Dee confirms Max was with her.</p>
+        <p>• Two witnesses confirm Ava arrived after the candle disappeared.</p>
+        <p>• Dee confirms Max was with her the entire time.</p>
         <p>• Icing was found on Milo's sleeve.</p>
         <p>• Only one suspect is lying.</p>
       </div>
@@ -294,7 +340,13 @@ function roomThree() {
         <button class="suspect-button" onclick="checkRoomThree('milo')">Milo</button>
       </div>
       <p id="feedback" class="answer-feedback"></p>
-      <button class="hint-button" onclick="showRoomHint(3)">I NEED A HINT</button>
+
+      <div class="investigator-note">
+        <strong>UNRELATED FILE DISCOVERED:</strong>
+        "Low Rent Vagina Amanda." The Bureau has no further comment.
+      </div>
+
+      <button class="hint-button" onclick="showHint('Which suspect has physical evidence connecting them to the cake, despite claiming they were nowhere near it?')">I NEED A HINT</button>
       <p id="hint-display" class="hint-display"></p>
     </section>
   `;
@@ -304,86 +356,109 @@ function checkRoomThree(answer) {
   if (answer === "milo") {
     completeRoom(3, "MILO'S ICING-STAINED STATEMENT");
   } else {
-    wrongAnswer("Check the confirmed evidence. One person's statement directly contradicts what was found.");
+    wrongAnswer("Check the evidence. One suspect's statement directly contradicts what was found.");
   }
 }
 
-// ROOM 4 — BIRTHDAY DISASTER
+// --------------------------------------------------
+// ROOM 4 — THE BIRTHDAY BUSINESS
+// --------------------------------------------------
 
 function roomFour() {
   app.innerHTML = `
     <section class="game-card">
       ${roomHeader(4)}
-      <h1>THE BIRTHDAY DISASTER</h1>
-      <p class="scene-intro">The party setup has been scrambled. Put the four events in the correct order using the clues below.</p>
+      <h1>THE BIRTHDAY BUSINESS</h1>
+      <p class="scene-intro">
+        The birthday party is almost ready. Almost.
+        Unfortunately, someone has mixed up the party checklist.
+        The charcuterie board is in danger. We need to act.
+      </p>
 
-      <div class="clue-display">
-        <h3>📋 THE INSTRUCTIONS</h3>
-        <p>1. The balloons were set up first.</p>
-        <p>2. The cake arrived immediately after the balloons.</p>
-        <p>3. Music started after the cake arrived.</p>
-        <p>4. Confetti was saved for last. (For obvious reasons. Cleanup.)</p>
+      <div class="charcuterie">
+        <div>🧀</div><div>🍇</div><div>🥨</div><div>🍓</div><div>🍫</div>
+        <p>THE BOARD OF IMPORTANT DECISIONS</p>
       </div>
 
-      <h2>Choose the correct order</h2>
-      <p class="instruction">Select the event in each position.</p>
+      <div class="clue-display">
+        <h3>📋 THE PARTY PLANNER'S NOTES</h3>
+        <p>1. Crackers must be placed first.</p>
+        <p>2. Cheese goes immediately after crackers.</p>
+        <p>3. Fruit goes after the cheese.</p>
+        <p>4. Chocolate is saved for last. Obviously.</p>
+      </div>
+
+      <h2>Put the board in order</h2>
+      <p class="instruction">Choose what goes in each position.</p>
 
       <div class="order-list">
         ${[1,2,3,4].map(n => `
           <label class="order-row">
             <strong>${n}.</strong>
             <select id="order-${n}" class="puzzle-input">
-              <option value="">Choose an event</option>
-              <option value="balloons">🎈 Balloons</option>
-              <option value="cake">🎂 Cake</option>
-              <option value="music">🎵 Music</option>
-              <option value="confetti">🎊 Confetti</option>
+              <option value="">Choose an item</option>
+              <option value="crackers">🥨 Crackers</option>
+              <option value="cheese">🧀 Cheese</option>
+              <option value="fruit">🍇 Fruit</option>
+              <option value="chocolate">🍫 Chocolate</option>
             </select>
           </label>
         `).join("")}
       </div>
 
-      <button onclick="checkRoomFour()">SUBMIT THE PARTY PLAN →</button>
+      <button onclick="checkRoomFour()">SAVE THE CHARCUTERIE BOARD →</button>
       <p id="feedback" class="answer-feedback"></p>
-      <button class="hint-button" onclick="showRoomHint(4)">I NEED A HINT</button>
+
+      <div class="investigator-note">
+        <strong>ADDITIONAL INTELLIGENCE:</strong>
+        The subject has been known to collect Optimum points, get her steps in,
+        and maintain an impressive nail situation. All considered suspiciously organised.
+      </div>
+
+      <button class="hint-button" onclick="showHint('The notes already tell you the exact order. Read them one at a time!')">I NEED A HINT</button>
       <p id="hint-display" class="hint-display"></p>
     </section>
   `;
 }
 
 function checkRoomFour() {
-  const correct = ["balloons", "cake", "music", "confetti"];
-  const answers = [1,2,3,4].map(n => document.getElementById(`order-${n}`).value);
+  const correct = ["crackers", "cheese", "fruit", "chocolate"];
+  const answers = [1, 2, 3, 4].map(n => document.getElementById(`order-${n}`).value);
 
   if (answers.every((value, i) => value === correct[i])) {
-    completeRoom(4, "THE PERFECT PARTY ORDER");
+    completeRoom(4, "THE PERFECT CHARCUTERIE BOARD");
   } else {
-    wrongAnswer("The party is still a mess. Re-read the four instructions and try again.");
+    wrongAnswer("The board is still in chaos. Re-read the planner's notes and try again.");
   }
 }
 
-// ROOM 5 — FINAL FILE
+// --------------------------------------------------
+// ROOM 5 — THE FINAL FILE
+// --------------------------------------------------
 
 function roomFive() {
   app.innerHTML = `
     <section class="game-card">
       ${roomHeader(5)}
       <h1>THE FINAL FILE</h1>
-      <p class="scene-intro">Detective, you've made it to the final room. The Bureau has one last test before revealing the truth.</p>
+      <p class="scene-intro">
+        Detective, you've made it to the final room.
+        The Bureau has one last password to check.
+      </p>
 
       <div class="final-evidence">
-        <p>📁 Your collected evidence:</p>
-        ${progress.evidence.map(item => `<div>✓ ${item}</div>`).join("")}
+        <h3>📁 YOUR COLLECTED EVIDENCE</h3>
+        ${progress.evidence.map(item => `<p>✓ ${item}</p>`).join("")}
       </div>
 
       <div class="cipher-paper">
         <p class="eyebrow">FINAL PASSWORD REQUIRED</p>
-        <h2>HAPPY DEE</h2>
-        <p>Put the two words together. No spaces. No punctuation.</p>
+        <h2>HAPPY · 49 · DEE</h2>
+        <p>Put the three parts together. No spaces. No punctuation.</p>
       </div>
 
       <label class="puzzle-label" for="final-answer">Enter the final password</label>
-      <input id="final-answer" class="puzzle-input" placeholder="The final password..." autocomplete="off">
+      <input id="final-answer" class="puzzle-input" placeholder="Your final answer..." autocomplete="off">
       <button onclick="checkRoomFive()">UNLOCK THE FINAL FILE →</button>
       <p id="feedback" class="answer-feedback"></p>
     </section>
@@ -391,14 +466,17 @@ function roomFive() {
 }
 
 function checkRoomFive() {
-  const answer = document.getElementById("final-answer").value.trim().toUpperCase().replace(/\s/g, "");
-  if (answer === "HAPPYDEE") {
-    progress.completed.push(5);
+  const answer = document.getElementById("final-answer").value
+    .trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+  if (answer === "HAPPY49DEE") {
+    if (!progress.completed.includes(5)) progress.completed.push(5);
     progress.unlocked = 5;
+    addEvidence("THE FINAL FILE");
     saveProgress();
     showFinalReveal();
   } else {
-    wrongAnswer("So close. The final password is written right there in the file. No need to overthink it!");
+    wrongAnswer("You're so close. Combine the three parts shown above!");
   }
 }
 
@@ -407,43 +485,45 @@ function showFinalReveal() {
     <section class="game-card final-reveal">
       <p class="eyebrow">BIRTHDAY INVESTIGATION BUREAU · CASE CLOSED</p>
       <div class="big-doodle">🎂 🎉 🥳</div>
-      <h1>HAPPY BIRTHDAY, DEE!</h1>
-      <p class="scene-intro">
-        You've solved every mystery, uncovered every clue,
-        and survived the most unnecessarily complicated birthday investigation ever assembled.
-      </p>
+      <h1>HAPPY 49TH BIRTHDAY, DEE!</h1>
+
       <div class="birthday-message">
-        <h2>A MESSAGE FROM YOUR FAVOURITE INVESTIGATION TEAM</h2>
-        <p>We hope your birthday is full of laughter, ridiculous moments, and people who appreciate just how wonderful you are.</p>
-        <p>Thank you for being you. We love you!</p>
-        <p>— The Birthday Investigation Bureau ❤️</p>
+        <h2>TO DEE ❤️</h2>
+        <p>
+          You've officially survived five rooms, several questionable
+          investigations, and an unreasonable amount of birthday bureaucracy.
+        </p>
+        <p>
+          Here's to your next chapter: more laughter, more adventures,
+          more time by the water, more lovely moments with your girls,
+          and plenty of reasons to celebrate yourself.
+        </p>
+        <p>
+          Keep being the woman who lifts other women up, shows up for people,
+          makes everyone laugh, and somehow manages to turn reward points
+          into a competitive sport.
+        </p>
+        <p>
+          We hope this next year brings you all the good things you deserve.
+          You are loved, appreciated, and very much worth celebrating.
+        </p>
+        <p><strong>Happy birthday, Dee. ❤️</strong></p>
       </div>
+
       <div class="big-doodle">🏆 CASE CLOSED 🏆</div>
       <button onclick="showDashboard()">REVISIT THE CASE FILES</button>
     </section>
   `;
 }
 
-// HINTS
-
-function showRoomHint(number) {
-  const hints = {
-    1: "Not every suspicious clue is useful. The pawprints are a distraction.",
-    2: "To reverse a forward shift, move each letter one place BACKWARDS.",
-    3: "Which suspect has physical evidence that contradicts their statement?",
-    4: "The clues already give you the order. Start with the event that must happen first.",
-  };
-
-  const display = document.getElementById("hint-display");
-  if (display) display.textContent = hints[number];
-}
+// --------------------------------------------------
+// RESET
+// --------------------------------------------------
 
 function confirmReset() {
-  if (confirm("Are you absolutely sure? This will erase all saved progress on this device.")) {
+  if (confirm("Are you sure? This will erase all saved progress on this device.")) {
     localStorage.removeItem(SAVE_KEY);
-    progress = { ...defaultProgress, completed: [], evidence: [] };
-    inspected.clear();
+    progress = freshProgress();
     showDashboard();
   }
 }
-

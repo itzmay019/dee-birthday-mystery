@@ -507,7 +507,8 @@ function showFinalReveal() {
           We hope this next year brings you all the good things you deserve.
           You are loved, appreciated, and very much worth celebrating.
         </p>
-        <p><strong>Happy birthday, Dee. ❤️</strong></p>
+        <p><strong>Happy birthday, Aunty Dee. ❤️</strong></p>
+        <p>Love, Maya.</p>
       </div>
 
       <div class="big-doodle">🏆 CASE CLOSED 🏆</div>

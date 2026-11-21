@@ -462,3 +462,213 @@ footer {
     }
   }
   
+/* MULTI-ROOM GAME SYSTEM */
+
+.back-button {
+    background: transparent;
+    color: var(--navy);
+    border: 0;
+    padding: 5px 0 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 22px 0;
+  }
+  
+  .dashboard-stats div {
+    background: #f1edff;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+  
+  .dashboard-stats strong {
+    font-size: 1.8rem;
+  }
+  
+  .dashboard-stats span {
+    font-size: 0.8rem;
+  }
+  
+  .room-list {
+    display: grid;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  
+  .room-card {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    background: #fffdf5;
+    border: 2px solid var(--navy);
+    border-radius: 14px;
+    padding: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+  }
+  
+  .room-card:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+  }
+  
+  .room-card.room-done {
+    background: #e4f5e9;
+    border-color: #5b9b79;
+  }
+  
+  .room-icon {
+    font-size: 2rem;
+  }
+  
+  .room-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  
+  .room-info strong {
+    font-size: 0.85rem;
+  }
+  
+  .room-info small {
+    opacity: 0.7;
+  }
+  
+  .room-status {
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  
+  .reset-button {
+    background: transparent;
+    color: #a15c5c;
+    border: 1px dashed #a15c5c;
+    margin-top: 15px;
+    font-size: 0.75rem;
+  }
+  
+  .cipher-paper {
+    background: #fff4df;
+    border: 2px dashed #d6a34f;
+    padding: 24px 15px;
+    border-radius: 14px;
+    text-align: center;
+    margin: 24px 0;
+  }
+  
+  .cipher-code {
+    font-size: 2.4rem;
+    letter-spacing: 7px;
+    margin: 15px 0;
+  }
+  
+  .puzzle-label {
+    display: block;
+    font-weight: 700;
+    margin: 18px 0 8px;
+  }
+  
+  .puzzle-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: white;
+    color: var(--ink);
+    border: 2px solid #a18bcf;
+    border-radius: 10px;
+    padding: 13px;
+    font: inherit;
+    margin-bottom: 12px;
+  }
+  
+  .suspect-file {
+    background: #fffdf5;
+    border: 2px solid #d8cba9;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    transform: rotate(-0.3deg);
+  }
+  
+  .suspect-file h3 {
+    margin: 0 0 7px;
+  }
+  
+  .suspect-file p {
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .order-list {
+    display: grid;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .order-row {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .order-row .puzzle-input {
+    margin: 0;
+  }
+  
+  .evidence-award,
+  .final-evidence,
+  .birthday-message {
+    background: #f1edff;
+    border: 2px dashed #a18bcf;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .evidence-award {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .final-reveal {
+    text-align: center;
+  }
+  
+  .birthday-message {
+    text-align: left;
+    background: #fff4df;
+    border-color: #e7a83e;
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 480px) {
+    .room-card {
+      padding: 11px;
+      gap: 8px;
+    }
+  
+    .room-info strong {
+      font-size: 0.75rem;
+    }
+  
+    .room-status {
+      font-size: 0.65rem;
+    }
+  }
+  

@@ -33,7 +33,6 @@ const rooms = [
 ];
 
 function startGame() {
-    alert("JAVASCRIPT IS CONNECTED!");
     showDashboard();
   }
 
